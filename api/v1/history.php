@@ -5,13 +5,19 @@ include "../../connection.php";
 include "../../ResponseFormatter.php";
 
 $uri = getUriPath($_SERVER['REQUEST_URI']);
+$userId = $_GET['user_id'];
+$currentPage = 0;
 
-getAll(10, $uri);
+if (isset($_GET['page'])) {
+    $currentPage = ceil($_GET['page'] - 1);
+}
 
-function getAll($rowPerPage, $uri)
+getAll(10, $uri, $userId, $currentPage);
+
+function getAll($rowPerPage, $uri, $userId, $currentPage)
 {
     global $connection;
-    $query = "SELECT * FROM history LIMIT $rowPerPage";
+    $query = "SELECT * FROM history WHERE user_id = $userId LIMIT $rowPerPage OFFSET " . ceil($rowPerPage * $currentPage) . "";
     $result = $connection->query($query);
     $historyData = array();
 
@@ -20,9 +26,9 @@ function getAll($rowPerPage, $uri)
             $historyData[] = $row;
         }
 
-        echo ResponseFormatter::success($uri, $historyData, 'Berhasil Ambil Data', 1, $result->num_rows, getTotalPage('history'), getTotalItem('history'),);
+        echo ResponseFormatter::success($uri, $historyData, 'Berhasil Ambil Data', $currentPage + 1, $result->num_rows, getTotalPage('history'), getTotalItem('history'),);
     } else {
-        echo ResponseFormatter::error($uri, null, 'Gagal Ambil Data!');
+        echo ResponseFormatter::success($uri, $historyData, 'Berhasil Ambil Data', $currentPage + 1, $result->num_rows, getTotalPage('history'), getTotalItem('history'),);
     }
 
     return $historyData;

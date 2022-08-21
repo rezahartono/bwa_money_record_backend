@@ -49,5 +49,6 @@ function getTotalItem($tableName)
     $query = "SELECT COUNT(*) FROM $tableName";
     $result = $connection->query($query);
     $row = $result->fetch_row();
-    return $row[0];
+    return (int)$row[0];
 }
+
