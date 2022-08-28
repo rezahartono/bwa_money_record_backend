@@ -18,18 +18,20 @@ function getAll($rowPerPage, $uri, $userId, $currentPage)
 {
     global $connection;
     $query = "SELECT * FROM history WHERE user_id = $userId LIMIT $rowPerPage OFFSET " . ceil($rowPerPage * $currentPage) . "";
-    $result = $connection->query($query);
+    $data = $connection->query($query);
     $historyData = array();
+    $result = null;
 
-    if ($result->num_rows > 0) {
-        while ($row = $result->fetch_assoc()) {
+
+    if ($data->num_rows > 0) {
+        while ($row = $data->fetch_assoc()) {
             $historyData[] = $row;
         }
 
-        echo ResponseFormatter::success($uri, $historyData, 'Berhasil Ambil Data', $currentPage + 1, $result->num_rows, getTotalPage('history'), getTotalItem('history'),);
+        $result = ResponseFormatter::success($uri, $historyData, 'Berhasil Ambil Data', $currentPage + 1, $data->num_rows, getTotalPage('history', "user_id = $userId"), getTotalItem('history', "user_id = $userId"),);
     } else {
-        echo ResponseFormatter::success($uri, $historyData, 'Berhasil Ambil Data', $currentPage + 1, $result->num_rows, getTotalPage('history'), getTotalItem('history'),);
+        $result = ResponseFormatter::success($uri, $historyData, 'Berhasil Ambil Data', $currentPage + 1, $data->num_rows, getTotalPage('history', "user_id = $userId"), getTotalItem('history', "user_id = $userId"),);
     }
 
-    return $historyData;
+    echo $result;
 }
